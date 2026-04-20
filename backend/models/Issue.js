@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const issueSchema = new mongoose.Schema({
   userId: { type: String},
+  userEmail: { type: String, trim: true },
+  userName: { type: String, trim: true },
   title: { type: String, required: true, trim: true },
   userMessage: { type: String, trim: true },
   status: { 

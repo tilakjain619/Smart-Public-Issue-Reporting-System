@@ -2,6 +2,8 @@ const Issue = require('../models/Issue');
 const analyzeImage = require('../utils/analyseImage');
 const getLocation = require('../utils/getLocation');
 const { logAction } = require('./logControl');
+const { users } = require('../lib/appwrite');
+const { sendDynamicEmail } = require('../utils/emailFunctionClient');
 
 // Create a new issue
 const createIssue = async (req, res) => {
@@ -34,8 +36,25 @@ const createIssue = async (req, res) => {
         // Get city and state from coordinates
         const { city, state } = await getLocation(coordinates.latitude, coordinates.longitude);
         console.log('💾 Creating issue in database...');
+
+            // Fetch user email and name from Appwrite for email notifications
+        let userEmail = '';
+        let userName = 'Citizen';
+        try {
+            if (users) {
+                const appwriteUser = await users.get(userId);
+                console.log('Appwrite user', appwriteUser);
+                userEmail = appwriteUser?.email || '';
+                userName = appwriteUser?.name || 'Citizen';
+            }
+        } catch (error) {
+            console.warn(`Could not fetch user details from Appwrite: ${error.message}`);
+        }
+
         const newIssue = await Issue.create({
             userId,
+            userEmail,
+            userName,
             userMessage: userMessage || '',
             category: analysis.category || 'Unknown',
             title: analysis.title || "Unknown Issue",
@@ -164,6 +183,46 @@ const updateIssueStatus = async (req, res) => {
             severity: status === 'resolved' ? 'info' : 'warning',
             req
         });
+        if (status === 'resolved' && previousStatus !== 'resolved') {
+            try {
+                // Use email stored with issue, or fallback to request body
+                let recipientEmail = req.body.email || issue.userEmail;
+                let recipientName = req.body.userName || issue.userName || 'Citizen';
+
+                if (recipientEmail) {
+                    const emailResult = await sendDynamicEmail({
+                        email: recipientEmail,
+                        type: 'issue_resolved',
+                        templateData: {
+                            userName: recipientName,
+                            issueTitle: issue.title,
+                            issueId: issue._id?.toString(),
+                            city: issue.city,
+                            state: issue.state,
+                            previousStatus,
+                            currentStatus: status
+                        }
+                    });
+
+                    if (emailResult && emailResult.success === false) {
+                        throw new Error(typeof emailResult.error === 'string' ? emailResult.error : 'Email provider rejected request');
+                    }
+                } else {
+                    console.warn(`Skipped issue resolved email for issue ${id}: recipient email not found`);
+                }
+            } catch (emailError) {
+                console.error('Failed to send issue resolved email:', emailError.message);
+                await logAction({
+                    userType: 'admin',
+                    userId: req.body.userId || 'system',
+                    action: 'Issue Resolved Email Failed',
+                    issueId: id,
+                    details: `Failed to send resolved email notification: ${emailError.message}`,
+                    severity: 'warning',
+                    req
+                });
+            }
+        }
 
         res.status(200).json(issue);
 
