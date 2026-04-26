@@ -200,7 +200,8 @@ const updateIssueStatus = async (req, res) => {
                             city: issue.city,
                             state: issue.state,
                             previousStatus,
-                            currentStatus: status
+                            currentStatus: status,
+                            resolutionImageUrl: issue.resolutionImageUrl
                         }
                     });
 
@@ -349,6 +350,35 @@ const assignOfficerToIssue = async (req, res) => {
             req
         });
 
+        // Send email to assigned officer
+        if (officerId && updatedIssue.assignedOfficer && updatedIssue.assignedOfficer.email) {
+            try {
+                await sendDynamicEmail({
+                    email: updatedIssue.assignedOfficer.email,
+                    type: 'issue_assigned',
+                    templateData: {
+                        officerName: updatedIssue.assignedOfficer.fullName,
+                        issueTitle: updatedIssue.title,
+                        issueId: updatedIssue._id.toString(),
+                        city: updatedIssue.city,
+                        state: updatedIssue.state
+                    }
+                });
+            } catch (emailError) {
+                console.error('Failed to send assignment email:', emailError.message);
+                // Log the email failure
+                await logAction({
+                    userType: 'system',
+                    userId: 'system',
+                    action: 'Email Notification Failed',
+                    issueId: id,
+                    details: `Failed to notify officer ${updatedIssue.assignedOfficer.fullName} via email: ${emailError.message}`,
+                    severity: 'warning',
+                    req
+                });
+            }
+        }
+
         res.status(200).json(updatedIssue);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -402,6 +432,35 @@ const resolveIssueByOfficer = async (req, res) => {
             severity: 'info',
             req
         });
+
+        // Send resolution email to the person who reported it
+        if (issue.userEmail) {
+            try {
+                await sendDynamicEmail({
+                    email: issue.userEmail,
+                    type: 'issue_resolved',
+                    templateData: {
+                        userName: issue.userName || 'Citizen',
+                        issueTitle: issue.title,
+                        issueId: issue._id.toString(),
+                        city: issue.city,
+                        state: issue.state,
+                        resolutionImageUrl: resolutionImageUrl
+                    }
+                });
+            } catch (emailError) {
+                console.error('Failed to send resolution email to reporter:', emailError.message);
+                await logAction({
+                    userType: 'system',
+                    userId: 'system',
+                    action: 'Email Notification Failed',
+                    issueId: id,
+                    details: `Failed to notify reporter ${issue.userName} of resolution: ${emailError.message}`,
+                    severity: 'warning',
+                    req
+                });
+            }
+        }
 
         res.status(200).json(issue);
     } catch (error) {

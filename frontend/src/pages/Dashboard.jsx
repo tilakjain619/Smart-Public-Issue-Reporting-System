@@ -6,6 +6,7 @@ import { SignedIn, SignedOut, SignInButton } from '../components/AuthComponents'
 import IssuePopup from '../components/IssuePopup'
 import Loader from '../components/extras/Loader'
 import MapUI from '../components/MapUI'
+import { MapPin } from 'lucide-react'
 
 const Dashboard = () => {
   const [userIssues, setUserIssues] = useState([])
@@ -102,12 +103,25 @@ const Dashboard = () => {
               ) : (
                 <ul className="mb-6">
                   {userIssues.slice(0, 5).map(issue => (
-                    <li onClick={() => handleShowIssuePopup(issue)} key={issue._id} className="bg-white cursor-pointer rounded-lg shadow p-4 mb-2 flex justify-between items-center">
-                      <span className="font-medium text-zinc-700">{issue.title}</span>
-                      <span className={`px-3 py-1 capitalize rounded-full text-xs font-bold ${issue.status === 'resolved' ? 'bg-green-200 text-green-800' :
-                          issue.status === 'pending' ? 'bg-red-200 text-red-800' :
-                            issue.status === 'in-progress' ? 'bg-yellow-200 text-yellow-800' :
-                              'bg-amber-200 text-amber-800'
+                    <li onClick={() => handleShowIssuePopup(issue)} key={issue._id} className="bg-white cursor-pointer rounded-lg shadow p-4 mb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50 transition-colors border border-zinc-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded bg-zinc-100 overflow-hidden flex-shrink-0 border border-zinc-200">
+                          {issue.status === 'resolved' && issue.resolutionImageUrl ? (
+                            <img src={issue.resolutionImageUrl} alt="Resolved" className="w-full h-full object-cover" />
+                          ) : issue.imageUrl ? (
+                            <img src={issue.imageUrl} alt="Issue" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-zinc-300">
+                              <MapPin className="w-4 h-4" />
+                            </div>
+                          )}
+                        </div>
+                        <span className="font-medium text-zinc-700 line-clamp-1">{issue.title}</span>
+                      </div>
+                      <span className={`px-3 py-1 capitalize rounded-full text-[10px] font-bold w-fit ${issue.status === 'resolved' ? 'bg-green-200 text-green-800 border border-green-300' :
+                          issue.status === 'pending' ? 'bg-red-100 text-red-800' :
+                            issue.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-amber-100 text-amber-800'
                         }`}>
                         {issue.status.replace('-', ' ')}
                       </span>

@@ -132,17 +132,39 @@ const IssuePopup = ({issue, setShowIssuePopup, onUpdate}) => {
         )}
 
         {/* Image / content */}
-        {issueData.imageUrl ? (
-          <img
-            src={issueData.imageUrl}
-            alt="Issue"
-            className="mt-4 w-full max-h-64 object-cover rounded-md border border-zinc-200"
-          />
-        ) : (
-          <div className="mt-4 w-full h-32 flex items-center justify-center rounded-md border border-dashed border-zinc-200 text-zinc-400 py-8">
-            No image provided
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-1">Initial Report</span>
+            {issueData.imageUrl ? (
+              <img
+                src={issueData.imageUrl}
+                alt="Issue"
+                className="w-full h-48 object-cover rounded-lg border border-zinc-200"
+              />
+            ) : (
+              <div className="w-full h-48 flex items-center justify-center rounded-lg border border-dashed border-zinc-200 text-zinc-400">
+                No image provided
+              </div>
+            )}
           </div>
-        )}
+
+          {issueData.status === 'resolved' && (
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider px-1">Resolution Proof</span>
+              {issueData.resolutionImageUrl ? (
+                <img
+                  src={issueData.resolutionImageUrl}
+                  alt="Resolution"
+                  className="w-full h-48 object-cover rounded-lg border-2 border-emerald-100 shadow-sm"
+                />
+              ) : (
+                <div className="w-full h-48 flex items-center justify-center rounded-lg border border-dashed border-emerald-100 bg-emerald-50 text-emerald-600 italic text-sm">
+                  Waiting for proof...
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Message */}
         {issueData.userMessage ? (

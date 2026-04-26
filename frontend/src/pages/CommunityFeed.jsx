@@ -388,17 +388,35 @@ const CommunityFeed = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Issue Title */}
-                                            <h3 className="font-semibold text-zinc-800 mb-2 group-hover:text-orange-600 transition-colors">
-                                                {issue.title}
-                                            </h3>
-
-                                            {/* Issue Category */}
-                                            {issue.category && (
-                                                <p className="text-sm text-orange-600 font-medium mb-2">
-                                                    {issue.category}
-                                                </p>
-                                            )}
+                                            {/* Issue Title & Image */}
+                                            <div className="flex gap-4 mb-3">
+                                                <div className="flex-1">
+                                                    <h3 className="font-semibold text-zinc-800 group-hover:text-orange-600 transition-colors line-clamp-2">
+                                                        {issue.title}
+                                                    </h3>
+                                                    {issue.category && (
+                                                        <p className="text-xs text-orange-600 font-medium mt-1">
+                                                            {issue.category}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <div className="relative flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-zinc-100 border border-zinc-200">
+                                                    {issue.status === 'resolved' && issue.resolutionImageUrl ? (
+                                                        <div className="w-full h-full relative">
+                                                            <img src={issue.resolutionImageUrl} alt="Resolved" className="w-full h-full object-cover" />
+                                                            <div className="absolute inset-0 bg-emerald-500/10 flex items-center justify-center">
+                                                                <div className="bg-emerald-500 text-white text-[8px] font-bold px-1 rounded shadow-sm">FIXED</div>
+                                                            </div>
+                                                        </div>
+                                                    ) : issue.imageUrl ? (
+                                                        <img src={issue.imageUrl} alt="Issue" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                                                            <Search className="w-4 h-4" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
 
                                             {/* Issue Description */}
                                             {issue.userMessage && (

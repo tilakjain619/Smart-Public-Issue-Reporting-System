@@ -27,16 +27,36 @@ const sendDynamicEmail = async ({ email, type = 'generic', templateData = {}, su
         issue_resolved: (data = {}) => {
             const issueTitle = data.issueTitle || 'your reported issue';
             const cityState = [data.city, data.state].filter(Boolean).join(', ');
+            const resolutionImageUrl = data.resolutionImageUrl;
+            
             return {
                 subject: `Issue Resolved: ${issueTitle}`,
                 message: `Good news! Your reported issue "${issueTitle}" has been marked as resolved.${cityState ? ` Location: ${cityState}.` : ''}${data.issueId ? ` Issue ID: ${data.issueId}.` : ''}`,
                 html: `
-                    <p>Hello ${data.userName || 'Citizen'},</p>
-                    <p>Your reported issue <strong>${issueTitle}</strong> has been marked as <strong>resolved</strong>.</p>
-                    ${cityState ? `<p><strong>Location:</strong> ${cityState}</p>` : ''}
-                    ${data.issueId ? `<p><strong>Issue ID:</strong> ${data.issueId}</p>` : ''}
-                    <p>Thank you for helping improve your community.</p>
-                    <p>Best,<br>Jagruk Team</p>
+                    <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                        <h2 style="color: #2e7d32;">Issue Resolved!</h2>
+                        <p>Hello ${data.userName || 'Citizen'},</p>
+                        <p>Good news! Your reported issue <strong>${issueTitle}</strong> has been marked as <strong>resolved</strong> by our team.</p>
+                        
+                        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            ${cityState ? `<p><strong>Location:</strong> ${cityState}</p>` : ''}
+                            ${data.issueId ? `<p><strong>Issue ID:</strong> ${data.issueId}</p>` : ''}
+                        </div>
+
+                        ${resolutionImageUrl ? `
+                        <div style="margin: 20px 0;">
+                            <p><strong>Proof of Resolution:</strong></p>
+                            <img src="${resolutionImageUrl}" alt="Resolution Proof" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+                            <p style="font-size: 12px; margin-top: 8px;"><a href="${resolutionImageUrl}" target="_blank" style="color: #1976d2;">View full image</a></p>
+                        </div>
+                        ` : ''}
+
+                        <p>Thank you for your patience and for helping improve your community.</p>
+                        <p style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px;">
+                            Best regards,<br>
+                            <strong>Jagruk Team</strong>
+                        </p>
+                    </div>
                 `
             };
         },
@@ -50,6 +70,19 @@ const sendDynamicEmail = async ({ email, type = 'generic', templateData = {}, su
                 <p><strong>Current Status:</strong> ${data.currentStatus || 'updated'}</p>
                 ${data.issueId ? `<p><strong>Issue ID:</strong> ${data.issueId}</p>` : ''}
                 <p>Best,<br>Jagruk Team</p>
+            `
+        }),
+        issue_assigned: (data = {}) => ({
+            subject: `New Issue Assigned: ${data.issueTitle || 'Action Required'}`,
+            message: `Hello ${data.officerName || 'Officer'}, a new issue "${data.issueTitle || 'Unknown'}" has been assigned to you in ${data.city || 'your area'}.`,
+            html: `
+                <p>Hello <strong>${data.officerName || 'Officer'}</strong>,</p>
+                <p>A new issue has been assigned to you for resolution.</p>
+                <p><strong>Issue Title:</strong> ${data.issueTitle || 'Unknown'}</p>
+                <p><strong>Location:</strong> ${data.city || 'Unknown'}, ${data.state || 'Unknown'}</p>
+                ${data.issueId ? `<p><strong>Issue ID:</strong> ${data.issueId}</p>` : ''}
+                <p>Please log in to the officer portal to view details and update progress.</p>
+                <p>Best,<br>Jagruk Admin Team</p>
             `
         }),
         generic: (data = {}) => ({

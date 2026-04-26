@@ -9,7 +9,7 @@ const ManageIssues = () => {
   const [showIssuePopup, setShowIssuePopup] = useState(false);
   const [currentIssue, setCurrentIssue] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
@@ -85,7 +85,7 @@ const ManageIssues = () => {
     <>
       <div className={`max-w-6xl mx-auto px-4 transition-opacity duration-300 ${showIssuePopup ? 'opacity-40 blur-sm pointer-events-none' : 'opacity-100'}`}>
         <h1 className='text-2xl text-zinc-800 font-bold mb-4'>Manage Issues</h1>
-        
+
         {/* Search and Filter Section */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
           {/* Search Bar */}
@@ -125,7 +125,7 @@ const ManageIssues = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                 <select
                   value={filters.status}
-                  onChange={(e) => setFilters({...filters, status: e.target.value})}
+                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">All Status</option>
@@ -141,7 +141,7 @@ const ManageIssues = () => {
                   type="text"
                   placeholder="Filter by city"
                   value={filters.city}
-                  onChange={(e) => setFilters({...filters, city: e.target.value})}
+                  onChange={(e) => setFilters({ ...filters, city: e.target.value })}
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -151,7 +151,7 @@ const ManageIssues = () => {
                   value={`${filters.sortBy}-${filters.order}`}
                   onChange={(e) => {
                     const [sortBy, order] = e.target.value.split('-');
-                    setFilters({...filters, sortBy, order});
+                    setFilters({ ...filters, sortBy, order });
                   }}
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
@@ -191,25 +191,17 @@ const ManageIssues = () => {
                   </div>
 
                   <div className='flex flex-col items-end gap-2'>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                      (issue.status || '').toLowerCase() === 'resolved' ? 'bg-emerald-100 text-emerald-800' :
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${(issue.status || '').toLowerCase() === 'resolved' ? 'bg-emerald-100 text-emerald-800' :
                       (issue.status || '').toLowerCase() === 'in progress' ? 'bg-amber-100 text-amber-800' :
-                      'bg-slate-100 text-slate-800'
-                    }`}>
+                        'bg-slate-100 text-slate-800'
+                      }`}>
                       {((issue.status || 'pending').charAt(0).toUpperCase() + (issue.status || 'pending').slice(1))}
                     </span>
-                    <button
-                      onClick={() => handleShowIssuePopup(issue)}
-                      className='text-xs text-zinc-600 hover:text-zinc-800'
-                      aria-label={`View details for ${issue.title}`}
-                    >
-                      View
-                    </button>
                   </div>
                 </div>
 
                 <div className='mt-4 flex items-center justify-between gap-3'>
-                  <div className='flex items-center gap-2'>
+                  {/* <div className='flex items-center gap-2'>
                     <label className='text-sm font-medium text-zinc-700'>Update</label>
                     <select
                       aria-label={`Update status for ${issue.title}`}
@@ -221,11 +213,18 @@ const ManageIssues = () => {
                       <option value="in progress">In Progress</option>
                       <option value="resolved">Resolved</option>
                     </select>
-                  </div>
+                  </div> */}
 
                   <div className='text-xs text-zinc-500'>
                     {issue.createdAt ? new Date(issue.createdAt).toLocaleDateString() : null}
                   </div>
+                  <button
+                    onClick={() => handleShowIssuePopup(issue)}
+                    className='text-xs text-zinc-600 hover:text-zinc-800'
+                    aria-label={`View details for ${issue.title}`}
+                  >
+                    View
+                  </button>
                 </div>
               </li>
             ))}

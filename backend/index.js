@@ -15,12 +15,15 @@ if (!process.env.APPWRITE_PROJECT_ID) {
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/smart-community')
-.then(() => console.log('Connected to MongoDB'))
-.catch((error) => console.error('MongoDB connection error:', error));
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => console.error('MongoDB connection error:', error));
 
-// Middleware
+// Global Middleware
+app.use(cors({
+  origin: "*",
+}));
 app.use(express.json());
-app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.send('Welcome to Jagruk');

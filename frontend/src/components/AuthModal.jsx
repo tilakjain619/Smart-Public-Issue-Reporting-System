@@ -42,8 +42,8 @@ const AuthModal = ({ isOpen, onClose, mode = 'login' }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-[#000002c7] backdrop-blur-xs flex items-center justify-center z-50">
-            <div className="bg-white text-zinc-800 text-left p-6 rounded-lg w-96 max-w-md">
+        <div className="fixed inset-0 bg-[#000002c7] backdrop-blur-xs flex items-center justify-center z-100">
+            <div className="bg-white text-zinc-800 text-left p-6 rounded-lg w-96 max-w-md z-50">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl text-zinc-600 font-bold">
                         {currentMode === 'login' ? 'Sign In' : 'Sign Up'}
